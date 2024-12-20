@@ -3,7 +3,7 @@ local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
-local ReopenButton = Instance.new("TextButton")  -- Botão para reexibir a janela
+local ReShowButton = Instance.new("TextButton")
 local AutoFarmButton = Instance.new("TextButton")
 local PvPButton = Instance.new("TextButton")
 local AutoCollectButton = Instance.new("TextButton")
@@ -17,21 +17,17 @@ local autoCollectEnabled = false
 -- Adicionar ao jogador
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Função para centralizar a janela
-local function centralizeFrame(frame)
-    frame.Position = UDim2.new(0.5, -frame.Size.X.Offset / 2, 0.5, -frame.Size.Y.Offset / 2)
-end
-
 -- Configuração do MainFrame
 MainFrame.Size = UDim2.new(0, 300, 0, 400)  -- Maior janela
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainFrame.Parent = ScreenGui
-centralizeFrame(MainFrame)  -- Centraliza a janela ao abrir
+MainFrame.Visible = true  -- Inicialmente visível
 
 -- Configuração do título
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-Title.Text = "Menu"
+Title.Text = "Menu Muscle Legends"
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.TextScaled = true
 Title.Parent = MainFrame
@@ -44,14 +40,14 @@ MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
 MinimizeButton.BackgroundColor3 = Color3.new(0.5, 0.1, 0.1)
 MinimizeButton.Parent = MainFrame
 
--- Botão de reexibição da janela
-ReopenButton.Size = UDim2.new(0, 200, 0, 50)
-ReopenButton.Position = UDim2.new(0.5, -100, 0.5, -200)  -- Centralizado após minimização
-ReopenButton.Text = "Reexibir Janela"
-ReopenButton.TextColor3 = Color3.new(1, 1, 1)
-ReopenButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
-ReopenButton.Parent = ScreenGui
-ReopenButton.Visible = false  -- Inicialmente invisível
+-- Botão de Reexibir (Quando minimizado)
+ReShowButton.Size = UDim2.new(0, 100, 0, 50)
+ReShowButton.Position = UDim2.new(0.5, -50, 0.9, 0)
+ReShowButton.Text = "Mostrar Menu"
+ReShowButton.TextColor3 = Color3.new(1, 1, 1)
+ReShowButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
+ReShowButton.Parent = ScreenGui
+ReShowButton.Visible = false  -- Inicialmente invisível
 
 -- Botão Auto Farm
 AutoFarmButton.Size = UDim2.new(1, 0, 0, 50)
@@ -69,10 +65,10 @@ PvPButton.TextColor3 = Color3.new(1, 1, 1)
 PvPButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
 PvPButton.Parent = MainFrame
 
--- Botão Auto Coleta
+-- Botão Auto Coleta (Baús)
 AutoCollectButton.Size = UDim2.new(1, 0, 0, 50)
 AutoCollectButton.Position = UDim2.new(0, 0, 0, 180)
-AutoCollectButton.Text = "Auto Coleta: OFF"
+AutoCollectButton.Text = "Coletar Baús: OFF"
 AutoCollectButton.TextColor3 = Color3.new(1, 1, 1)
 AutoCollectButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
 AutoCollectButton.Parent = MainFrame
@@ -81,18 +77,17 @@ AutoCollectButton.Parent = MainFrame
 MinimizeButton.MouseButton1Click:Connect(function()
     IsMinimized = not IsMinimized
     MainFrame.Visible = not IsMinimized  -- Alterna a visibilidade
-    ReopenButton.Visible = IsMinimized  -- Mostra o botão de reexibir a janela
+    ReShowButton.Visible = IsMinimized  -- Mostra o botão de reexibir quando minimizado
 end)
 
 -- Função para reexibir a janela
-ReopenButton.MouseButton1Click:Connect(function()
+ReShowButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ReShowButton.Visible = false
     IsMinimized = false
-    MainFrame.Visible = true  -- Torna a janela visível
-    ReopenButton.Visible = false  -- Esconde o botão de reexibição
-    centralizeFrame(MainFrame)  -- Centraliza a janela novamente
 end)
 
--- Função para ativar/desativar Auto Farm
+-- Função para ativar/desativar Auto Farm (simulando o clique)
 AutoFarmButton.MouseButton1Click:Connect(function()
     autofarmEnabled = not autofarmEnabled
     AutoFarmButton.Text = autofarmEnabled and "Auto Farm: ON" or "Auto Farm: OFF"
@@ -104,10 +99,10 @@ AutoFarmButton.MouseButton1Click:Connect(function()
                     -- Simula um clique na tela para farmar
                     local player = game.Players.LocalPlayer
                     if player.Character then
-                        -- Verifica se o jogador está próximo de algum item ou "peso"
+                        -- Ativar ferramenta (simula o clique)
                         local tool = player.Character:FindFirstChildOfClass("Tool")
                         if tool then
-                            tool:Activate()  -- Simula o clique para farmar
+                            tool:Activate()  -- Simula o clique para farmar força
                         end
                     end
                 end)
@@ -125,25 +120,23 @@ PvPButton.MouseButton1Click:Connect(function()
             while pvpEnabled do
                 wait(1)
                 pcall(function()
-                    local closestEnemy = nil
-                    local minDistance = 20
-                    for _, player in pairs(game.Players:GetPlayers()) do
-                        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
-                            local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude
-                            if distance < minDistance then
-                                closestEnemy = player
-                                minDistance = distance
+                    local player = game.Players.LocalPlayer
+                    if player.Character then
+                        -- Realiza a ação de ataque no PvP
+                        for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+                            if targetPlayer ~= player then
+                                local targetCharacter = targetPlayer.Character
+                                if targetCharacter and targetCharacter:FindFirstChild("Humanoid") then
+                                    local targetHumanoid = targetCharacter.Humanoid
+                                    local targetPosition = targetCharacter.HumanoidRootPart.Position
+                                    local distance = (player.Character.HumanoidRootPart.Position - targetPosition).Magnitude
+                                    if distance < 20 then
+                                        -- Simula um ataque automático no PvP
+                                        player.Character:MoveTo(targetPosition)
+                                        targetHumanoid:TakeDamage(10)
+                                    end
+                                end
                             end
-                        end
-                    end
-
-                    if closestEnemy then
-                        -- Teletransportar para o inimigo
-                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = closestEnemy.Character.HumanoidRootPart.CFrame
-                        -- Simula ataques no inimigo
-                        local humanoid = closestEnemy.Character:FindFirstChild("Humanoid")
-                        if humanoid then
-                            humanoid:TakeDamage(10)  -- Ataca o inimigo
                         end
                     end
                 end)
@@ -152,18 +145,19 @@ PvPButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Função para ativar/desativar Auto Coleta
+-- Função para ativar/desativar coleta de baús
 AutoCollectButton.MouseButton1Click:Connect(function()
     autoCollectEnabled = not autoCollectEnabled
-    AutoCollectButton.Text = autoCollectEnabled and "Auto Coleta: ON" or "Auto Coleta: OFF"
+    AutoCollectButton.Text = autoCollectEnabled and "Coletar Baús: ON" or "Coletar Baús: OFF"
     if autoCollectEnabled then
         spawn(function()
             while autoCollectEnabled do
-                wait(5)
+                wait(1)
                 pcall(function()
                     for _, obj in pairs(workspace:GetDescendants()) do
                         if obj.Name == "Reward" and obj:IsA("Part") then
                             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                            wait(0.1)  -- Aguarda um tempo para coletar o baú
                         end
                     end
                 end)
