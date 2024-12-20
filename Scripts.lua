@@ -1,72 +1,130 @@
--- Variáveis do jogador e do personagem
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local autoFarmEnabled = false -- Variável para controlar se o auto farm está ativo ou não
-
--- Criar a interface gráfica (GUI)
+-- Criar GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local MinimizeButton = Instance.new("TextButton")
+local AutoFarmButton = Instance.new("TextButton")
+local PvPButton = Instance.new("TextButton")
+local AutoCollectButton = Instance.new("TextButton")
 
--- Criar o painel de controle
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 100) -- Tamanho do painel
-frame.Position = UDim2.new(0.5, -100, 0.5, -50) -- Posição do painel
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame.BackgroundTransparency = 0.5
-frame.Parent = ScreenGui
+-- Configurações iniciais
+local autofarmEnabled = false
+local pvpEnabled = false
+local autoCollectEnabled = false
 
--- Criar o botão de Ativar
-local activateButton = Instance.new("TextButton")
-activateButton.Size = UDim2.new(0, 180, 0, 40)
-activateButton.Position = UDim2.new(0, 10, 0, 10)
-activateButton.Text = "Ativar Auto Farm"
-activateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-activateButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-activateButton.Parent = frame
+-- Adicionar ao jogador
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Criar o botão de Desativar
-local deactivateButton = Instance.new("TextButton")
-deactivateButton.Size = UDim2.new(0, 180, 0, 40)
-deactivateButton.Position = UDim2.new(0, 10, 0, 50)
-deactivateButton.Text = "Desativar Auto Farm"
-deactivateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-deactivateButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-deactivateButton.Parent = frame
+-- Configuração do MainFrame
+MainFrame.Size = UDim2.new(0, 200, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+MainFrame.Parent = ScreenGui
 
--- Função para ativar o Auto Farm
-local function StartAutoFarm()
-    while autoFarmEnabled do
-        -- Encontrar o objeto farmável (troque "FarmableObject" pelo nome do objeto no jogo)
-        local farmObject = workspace:FindFirstChild("FarmableObject")
-        if farmObject then
-            -- Move o personagem até o objeto farmável
-            character:MoveTo(farmObject.Position)
-            -- Espera até o personagem chegar
-            wait(1)
-            -- Interage com o objeto (se necessário)
-            farmObject.Touched:Connect(function(hit)
-                if hit.Parent == character then
-                    -- Simula a coleta (isso pode ser qualquer ação que o jogo faça ao interagir com o objeto)
-                    print("Coletando item!")
-                end
-            end)
-            wait(5)  -- Intervalo para repetir
-        else
-            print("Objeto não encontrado para farm.")
-        end
-        wait(2)  -- Intervalo entre tentativas
-    end
-end
+-- Configuração do título
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+Title.Text = "Menu"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextScaled = true
+Title.Parent = MainFrame
 
--- Função para ativar o Auto Farm ao clicar no botão
-activateButton.MouseButton1Click:Connect(function()
-    autoFarmEnabled = true
-    StartAutoFarm()  -- Inicia o Auto Farm
+-- Botão de minimizar
+MinimizeButton.Size = UDim2.new(0, 50, 0, 50)
+MinimizeButton.Position = UDim2.new(1, -50, 0, 0)
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
+MinimizeButton.BackgroundColor3 = Color3.new(0.5, 0.1, 0.1)
+MinimizeButton.Parent = MainFrame
+
+-- Botão Auto Farm
+AutoFarmButton.Size = UDim2.new(1, 0, 0, 50)
+AutoFarmButton.Position = UDim2.new(0, 0, 0, 60)
+AutoFarmButton.Text = "Auto Farm: OFF"
+AutoFarmButton.TextColor3 = Color3.new(1, 1, 1)
+AutoFarmButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
+AutoFarmButton.Parent = MainFrame
+
+-- Botão PvP
+PvPButton.Size = UDim2.new(1, 0, 0, 50)
+PvPButton.Position = UDim2.new(0, 0, 0, 120)
+PvPButton.Text = "PvP: OFF"
+PvPButton.TextColor3 = Color3.new(1, 1, 1)
+PvPButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
+PvPButton.Parent = MainFrame
+
+-- Botão Auto Coleta
+AutoCollectButton.Size = UDim2.new(1, 0, 0, 50)
+AutoCollectButton.Position = UDim2.new(0, 0, 0, 180)
+AutoCollectButton.Text = "Auto Coleta: OFF"
+AutoCollectButton.TextColor3 = Color3.new(1, 1, 1)
+AutoCollectButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
+AutoCollectButton.Parent = MainFrame
+
+-- Função para minimizar/maximizar
+MinimizeButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Função para desativar o Auto Farm ao clicar no botão
-deactivateButton.MouseButton1Click:Connect(function()
-    autoFarmEnabled = false
-    print("Auto Farm desativado.")
+-- Função para ativar/desativar Auto Farm
+AutoFarmButton.MouseButton1Click:Connect(function()
+    autofarmEnabled = not autofarmEnabled
+    AutoFarmButton.Text = autofarmEnabled and "Auto Farm: ON" or "Auto Farm: OFF"
+    if autofarmEnabled then
+        spawn(function()
+            while autofarmEnabled do
+                wait(0.1)
+                pcall(function()
+                    local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+                    if tool then
+                        tool:Activate()
+                    end
+                end)
+            end
+        end)
+    end
+end)
+
+-- Função para ativar/desativar PvP
+PvPButton.MouseButton1Click:Connect(function()
+    pvpEnabled = not pvpEnabled
+    PvPButton.Text = pvpEnabled and "PvP: ON" or "PvP: OFF"
+    if pvpEnabled then
+        spawn(function()
+            while pvpEnabled do
+                wait(1)
+                pcall(function()
+                    for _, player in pairs(game.Players:GetPlayers()) do
+                        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
+                            local humanoid = player.Character.Humanoid
+                            local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+                            if distance < 20 then
+                                humanoid:TakeDamage(10)
+                            end
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+end)
+
+-- Função para ativar/desativar Auto Coleta
+AutoCollectButton.MouseButton1Click:Connect(function()
+    autoCollectEnabled = not autoCollectEnabled
+    AutoCollectButton.Text = autoCollectEnabled and "Auto Coleta: ON" or "Auto Coleta: OFF"
+    if autoCollectEnabled then
+        spawn(function()
+            while autoCollectEnabled do
+                wait(5)
+                pcall(function()
+                    for _, obj in pairs(workspace:GetDescendants()) do
+                        if obj.Name == "Reward" and obj:IsA("Part") then
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                        end
+                    end
+                end)
+            end
+        end)
+    end
 end)
