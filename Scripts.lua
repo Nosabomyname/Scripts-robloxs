@@ -3,6 +3,7 @@ local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
+local ReopenButton = Instance.new("TextButton")  -- Botão para reexibir a janela
 local AutoFarmButton = Instance.new("TextButton")
 local PvPButton = Instance.new("TextButton")
 local AutoCollectButton = Instance.new("TextButton")
@@ -16,12 +17,16 @@ local autoCollectEnabled = false
 -- Adicionar ao jogador
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Configuração do MainFrame (ajuste na posição para mais em cima)
+-- Função para centralizar a janela
+local function centralizeFrame(frame)
+    frame.Position = UDim2.new(0.5, -frame.Size.X.Offset / 2, 0.5, -frame.Size.Y.Offset / 2)
+end
+
+-- Configuração do MainFrame
 MainFrame.Size = UDim2.new(0, 300, 0, 400)  -- Maior janela
-MainFrame.Position = UDim2.new(0.5, -150, 0, -150)  -- Posição ajustada para mais em cima
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainFrame.Parent = ScreenGui
-MainFrame.Visible = true  -- Inicialmente visível
+centralizeFrame(MainFrame)  -- Centraliza a janela ao abrir
 
 -- Configuração do título
 Title.Size = UDim2.new(1, 0, 0, 50)
@@ -38,6 +43,15 @@ MinimizeButton.Text = "-"
 MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
 MinimizeButton.BackgroundColor3 = Color3.new(0.5, 0.1, 0.1)
 MinimizeButton.Parent = MainFrame
+
+-- Botão de reexibição da janela
+ReopenButton.Size = UDim2.new(0, 200, 0, 50)
+ReopenButton.Position = UDim2.new(0.5, -100, 0.5, -200)  -- Centralizado após minimização
+ReopenButton.Text = "Reexibir Janela"
+ReopenButton.TextColor3 = Color3.new(1, 1, 1)
+ReopenButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
+ReopenButton.Parent = ScreenGui
+ReopenButton.Visible = false  -- Inicialmente invisível
 
 -- Botão Auto Farm
 AutoFarmButton.Size = UDim2.new(1, 0, 0, 50)
@@ -67,6 +81,15 @@ AutoCollectButton.Parent = MainFrame
 MinimizeButton.MouseButton1Click:Connect(function()
     IsMinimized = not IsMinimized
     MainFrame.Visible = not IsMinimized  -- Alterna a visibilidade
+    ReopenButton.Visible = IsMinimized  -- Mostra o botão de reexibir a janela
+end)
+
+-- Função para reexibir a janela
+ReopenButton.MouseButton1Click:Connect(function()
+    IsMinimized = false
+    MainFrame.Visible = true  -- Torna a janela visível
+    ReopenButton.Visible = false  -- Esconde o botão de reexibição
+    centralizeFrame(MainFrame)  -- Centraliza a janela novamente
 end)
 
 -- Função para ativar/desativar Auto Farm
