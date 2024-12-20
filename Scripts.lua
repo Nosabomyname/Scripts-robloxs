@@ -104,10 +104,10 @@ AutoFarmButton.MouseButton1Click:Connect(function()
                     -- Simula um clique na tela para farmar
                     local player = game.Players.LocalPlayer
                     if player.Character then
-                        -- Ativar ferramenta (simula o clique)
+                        -- Verifica se o jogador está próximo de algum item ou "peso"
                         local tool = player.Character:FindFirstChildOfClass("Tool")
                         if tool then
-                            tool:Activate()  -- Simula o clique para farmar força
+                            tool:Activate()  -- Simula o clique para farmar
                         end
                     end
                 end)
@@ -125,13 +125,25 @@ PvPButton.MouseButton1Click:Connect(function()
             while pvpEnabled do
                 wait(1)
                 pcall(function()
+                    local closestEnemy = nil
+                    local minDistance = 20
                     for _, player in pairs(game.Players:GetPlayers()) do
                         if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
-                            local humanoid = player.Character.Humanoid
                             local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude
-                            if distance < 20 then
-                                humanoid:TakeDamage(10)
+                            if distance < minDistance then
+                                closestEnemy = player
+                                minDistance = distance
                             end
+                        end
+                    end
+
+                    if closestEnemy then
+                        -- Teletransportar para o inimigo
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = closestEnemy.Character.HumanoidRootPart.CFrame
+                        -- Simula ataques no inimigo
+                        local humanoid = closestEnemy.Character:FindFirstChild("Humanoid")
+                        if humanoid then
+                            humanoid:TakeDamage(10)  -- Ataca o inimigo
                         end
                     end
                 end)
