@@ -6,6 +6,7 @@ local MinimizeButton = Instance.new("TextButton")
 local AutoFarmButton = Instance.new("TextButton")
 local PvPButton = Instance.new("TextButton")
 local AutoCollectButton = Instance.new("TextButton")
+local IsMinimized = false -- Variável para controlar o estado de minimização
 
 -- Configurações iniciais
 local autofarmEnabled = false
@@ -16,10 +17,11 @@ local autoCollectEnabled = false
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Configuração do MainFrame
-MainFrame.Size = UDim2.new(0, 200, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -150)
+MainFrame.Size = UDim2.new(0, 300, 0, 400)  -- Maior janela
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainFrame.Parent = ScreenGui
+MainFrame.Visible = true  -- Inicialmente visível
 
 -- Configuração do título
 Title.Size = UDim2.new(1, 0, 0, 50)
@@ -63,7 +65,8 @@ AutoCollectButton.Parent = MainFrame
 
 -- Função para minimizar/maximizar
 MinimizeButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+    IsMinimized = not IsMinimized
+    MainFrame.Visible = not IsMinimized  -- Alterna a visibilidade
 end)
 
 -- Função para ativar/desativar Auto Farm
@@ -75,9 +78,14 @@ AutoFarmButton.MouseButton1Click:Connect(function()
             while autofarmEnabled do
                 wait(0.1)
                 pcall(function()
-                    local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
-                    if tool then
-                        tool:Activate()
+                    -- Simula um clique na tela para farmar
+                    local player = game.Players.LocalPlayer
+                    if player.Character then
+                        -- Ativar ferramenta (simula o clique)
+                        local tool = player.Character:FindFirstChildOfClass("Tool")
+                        if tool then
+                            tool:Activate()  -- Simula o clique para farmar força
+                        end
                     end
                 end)
             end
