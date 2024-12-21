@@ -1,88 +1,106 @@
--- Criar GUI
+-- GUI
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
-local AutoFarmButton = Instance.new("TextButton")
-local AutoClickButton = Instance.new("TextButton")
-local AntiBanButton = Instance.new("TextButton")
-local IsMinimized = false
+local ReexibirButton = Instance.new("Frame")
 
 -- Variáveis de controle
-local autoFarmEnabled = false
-local autoClickEnabled = false
-local antiBanEnabled = false
+local isMinimized = false
+local Dragging = false
+local DragInput, StartPosition, DragStart
 
--- Adicionar ao jogador
+-- Adicionar GUI ao Player
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Configuração do MainFrame
-MainFrame.Size = UDim2.new(0, 300, 0, 450)
-MainFrame.Position = UDim2.new(0.5, -150, 0.5, -225)
-MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-MainFrame.Parent = ScreenGui
+-- Configuração da janela principal
+MainFrame.Size = UDim2.new(0, 600, 0, 400) -- Maior largura e comprimento
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
 MainFrame.Visible = true
+MainFrame.Parent = ScreenGui
 
 -- Configuração do título
 Title.Size = UDim2.new(1, 0, 0, 50)
-Title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-Title.Text = "Menu de Script"
+Title.Text = "Menu Principal"
 Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 Title.TextScaled = true
 Title.Parent = MainFrame
 
 -- Botão de minimizar
-MinimizeButton.Size = UDim2.new(0, 50, 0, 50)
-MinimizeButton.Position = UDim2.new(1, -50, 0, 0)
-MinimizeButton.Text = "-"
+MinimizeButton.Size = UDim2.new(0, 100, 0, 40)
+MinimizeButton.Position = UDim2.new(1, -110, 0, 5)
+MinimizeButton.Text = "Minimizar"
 MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.new(0.5, 0.1, 0.1)
+MinimizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
 MinimizeButton.Parent = MainFrame
 
--- Botão Auto Farm
-AutoFarmButton.Size = UDim2.new(1, 0, 0, 50)
-AutoFarmButton.Position = UDim2.new(0, 0, 0, 60)
-AutoFarmButton.Text = "Auto Farm: OFF"
-AutoFarmButton.TextColor3 = Color3.new(1, 1, 1)
-AutoFarmButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
-AutoFarmButton.Parent = MainFrame
+-- Botão de reexibir
+ReexibirButton.Size = UDim2.new(0, 50, 0, 50) -- Quadrado
+ReexibirButton.Position = UDim2.new(0.5, -25, 0.9, -25) -- Inicialmente centralizado na parte inferior
+ReexibirButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
+ReexibirButton.Visible = false
+ReexibirButton.Parent = ScreenGui
 
--- Botão Auto Click
-AutoClickButton.Size = UDim2.new(1, 0, 0, 50)
-AutoClickButton.Position = UDim2.new(0, 0, 0, 120)
-AutoClickButton.Text = "Auto Click: OFF"
-AutoClickButton.TextColor3 = Color3.new(1, 1, 1)
-AutoClickButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
-AutoClickButton.Parent = MainFrame
-
--- Botão Anti Ban
-AntiBanButton.Size = UDim2.new(1, 0, 0, 50)
-AntiBanButton.Position = UDim2.new(0, 0, 0, 180)
-AntiBanButton.Text = "Anti Ban: OFF"
-AntiBanButton.TextColor3 = Color3.new(1, 1, 1)
-AntiBanButton.BackgroundColor3 = Color3.new(0.2, 0.5, 0.2)
-AntiBanButton.Parent = MainFrame
-
--- Função para minimizar/maximizar
+-- Minimizar funcionalidade
 MinimizeButton.MouseButton1Click:Connect(function()
-    IsMinimized = not IsMinimized
-    MainFrame.Visible = not IsMinimized
+    MainFrame.Visible = false
+    ReexibirButton.Visible = true
 end)
 
--- Função para ativar/desativar Auto Farm
-AutoFarmButton.MouseButton1Click:Connect(function()
-    autoFarmEnabled = not autoFarmEnabled
-    AutoFarmButton.Text = autoFarmEnabled and "Auto Farm: ON" or "Auto Farm: OFF"
-    if autoFarmEnabled then
+-- Reexibir funcionalidade
+ReexibirButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ReexibirButton.Visible = false
+end)
+
+-- Tornar o botão de reexibir arrastável
+ReexibirButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        Dragging = true
+        DragStart = input.Position
+        StartPosition = ReexibirButton.Position
+    end
+end)
+
+ReexibirButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        DragInput = input
+    end
+end)
+
+ReexibirButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        Dragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == DragInput and Dragging then
+        local Delta = input.Position - DragStart
+        ReexibirButton.Position = UDim2.new(
+            StartPosition.X.Scale,
+            StartPosition.X.Offset + Delta.X,
+            StartPosition.Y.Scale,
+            StartPosition.Y.Offset + Delta.Y
+        )
+    end
+end)
+AutoSpeedButton.MouseButton1Click:Connect(function()
+    autoSpeedEnabled = not autoSpeedEnabled
+    AutoSpeedButton.Text = autoSpeedEnabled and "Auto Farm: Velocidade (ON)" or "Auto Farm: Velocidade (OFF)"
+    if autoSpeedEnabled then
         spawn(function()
-            while autoFarmEnabled do
+            while autoSpeedEnabled do
                 wait(0.1)
                 pcall(function()
                     local player = game.Players.LocalPlayer
-                    if player.Character then
-                        local tool = player.Character:FindFirstChildOfClass("Tool")
-                        if tool then
-                            tool:Activate()  -- Simula o clique para farmar
+                    local char = player.Character
+                    if char then
+                        local treadmill = workspace:FindFirstChild("Treadmill") or workspace:FindFirstChild("Esteira")
+                        if treadmill then
+                            char.Humanoid:MoveTo(treadmill.Position)
                         end
                     end
                 end)
@@ -90,59 +108,67 @@ AutoFarmButton.MouseButton1Click:Connect(function()
         end)
     end
 end)
-
--- Função para ativar/desativar Auto Click
-AutoClickButton.MouseButton1Click:Connect(function()
-    autoClickEnabled = not autoClickEnabled
-    AutoClickButton.Text = autoClickEnabled and "Auto Click: ON" or "Auto Click: OFF"
-    if autoClickEnabled then
+AutoStrengthButton.MouseButton1Click:Connect(function()
+    autoStrengthEnabled = not autoStrengthEnabled
+    AutoStrengthButton.Text = autoStrengthEnabled and "Auto Farm: Força (ON)" or "Auto Farm: Força (OFF)"
+    if autoStrengthEnabled then
         spawn(function()
-            while autoClickEnabled do
-                wait(0.1) -- Intervalo de clique
+            while autoStrengthEnabled do
+                wait(0.1)
                 pcall(function()
                     local player = game.Players.LocalPlayer
-                    local mouse = player:GetMouse()
-                    local position = mouse.Hit.p
-                    mouse1click(position)
-                end)
-            end
-        end)
-    end
-end)
-
--- Função para simular clique do mouse
-function mouse1click(position)
-    local userInputService = game:GetService("UserInputService")
-    local input = Instance.new("InputObject")
-    input.UserInputType = Enum.UserInputType.MouseButton1
-    input.Position = position
-    userInputService.InputBegan:Fire(input)
-end
-
--- Função Anti-Ban
-AntiBanButton.MouseButton1Click:Connect(function()
-    antiBanEnabled = not antiBanEnabled
-    AntiBanButton.Text = antiBanEnabled and "Anti Ban: ON" or "Anti Ban: OFF"
-    if antiBanEnabled then
-        spawn(function()
-            while antiBanEnabled do
-                wait(5)  -- Evita detecção de automação
-                pcall(function()
-                    -- Evita detecção automática
-                    local player = game.Players.LocalPlayer
-                    if player.Character then
-                        -- Exemplo de ação para reduzir o risco de banimento
-                        player.Character:MoveTo(Vector3.new(math.random(-100, 100), 50, math.random(-100, 100)))  -- Faz o personagem mover-se aleatoriamente
+                    local char = player.Character
+                    if char then
+                        local tool = char:FindFirstChildOfClass("Tool")
+                        if tool then
+                            tool:Activate() -- Auto Click
+                        end
                     end
                 end)
             end
         end)
     end
 end)
-
--- Função para dar controle à janela
-local function centerWindow()
-    MainFrame.Position = UDim2.new(0.5, -150, 0.5, -225)
-end
-
-centerWindow()  -- Inicializa a janela centralizada
+PVPButton.MouseButton1Click:Connect(function()
+    pvpEnabled = not pvpEnabled
+    PVPButton.Text = pvpEnabled and "PVP (ON)" or "PVP (OFF)"
+    if pvpEnabled then
+        spawn(function()
+            while pvpEnabled do
+                wait(0.1)
+                pcall(function()
+                    local player = game.Players.LocalPlayer
+                    local char = player.Character
+                    if char then
+                        local enemy = nil
+                        local closestDistance = 30 -- Limite de 30 metros
+                        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+                            if otherPlayer ~= player then
+                                local otherChar = otherPlayer.Character
+                                if otherChar and otherChar:FindFirstChild("HumanoidRootPart") then
+                                    local distance = (char.HumanoidRootPart.Position - otherChar.HumanoidRootPart.Position).Magnitude
+                                    if distance < closestDistance then
+                                        closestDistance = distance
+                                        enemy = otherChar
+                                    end
+                                end
+                            end
+                        end
+                        if enemy then
+                            char.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2) -- Teleportar perto
+                            spawn(function()
+                                while pvpEnabled and enemy and enemy:FindFirstChild("Humanoid") do
+                                    wait(0.05)
+                                    local tool = char:FindFirstChildOfClass("Tool")
+                                    if tool then
+                                        tool:Activate() -- Auto Click para atacar
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+end)
