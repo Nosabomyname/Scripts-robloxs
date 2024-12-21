@@ -25,7 +25,7 @@ MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150) -- Centralizando a janela
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
 -- Botão para minimizar
@@ -42,7 +42,7 @@ ReappearButton.Parent = ScreenGui
 ReappearButton.Text = "Delta"
 ReappearButton.Size = UDim2.new(0, 50, 0, 50)
 ReappearButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ReappearButton.Visible = false
+ReappearButton.Visible = false -- Inicialmente invisível
 
 -- Container das abas
 TabContainer.Name = "TabContainer"
