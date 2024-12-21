@@ -1,174 +1,170 @@
--- GUI
+-- Interface Gráfica
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
-local ReexibirButton = Instance.new("Frame")
+local ReappearButton = Instance.new("TextButton")
+local TabContainer = Instance.new("Frame")
+local Tab1 = Instance.new("TextButton")
+local Tab2 = Instance.new("TextButton")
+local Tab3 = Instance.new("TextButton")
+local ContentFrame = Instance.new("Frame")
 
--- Variáveis de controle
-local isMinimized = false
-local Dragging = false
-local DragInput, StartPosition, DragStart
+local AutoFarmForceButton = Instance.new("TextButton")
+local AutoFarmSpeedButton = Instance.new("TextButton")
+local PvPButton = Instance.new("TextButton")
 
--- Adicionar GUI ao Player
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local autoFarmForceActive = false
+local autoFarmSpeedActive = false
+local autoPvPActive = false
 
--- Configuração da janela principal
-MainFrame.Size = UDim2.new(0, 600, 0, 400) -- Maior largura e comprimento
-MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-MainFrame.Visible = true
+-- Configuração da Interface
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ResetOnSpawn = false
+
+MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
--- Configuração do título
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.Text = "Menu Principal"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-Title.TextScaled = true
-Title.Parent = MainFrame
-
--- Botão de minimizar
-MinimizeButton.Size = UDim2.new(0, 100, 0, 40)
-MinimizeButton.Position = UDim2.new(1, -110, 0, 5)
-MinimizeButton.Text = "Minimizar"
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = MainFrame
+MinimizeButton.Text = "-"
+MinimizeButton.Size = UDim2.new(0, 50, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -60, 0, 10)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 
--- Botão de reexibir
-ReexibirButton.Size = UDim2.new(0, 50, 0, 50) -- Quadrado
-ReexibirButton.Position = UDim2.new(0.5, -25, 0.9, -25) -- Inicialmente centralizado na parte inferior
-ReexibirButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.8)
-ReexibirButton.Visible = false
-ReexibirButton.Parent = ScreenGui
+ReappearButton.Name = "ReappearButton"
+ReappearButton.Parent = ScreenGui
+ReappearButton.Text = "Delta"
+ReappearButton.Size = UDim2.new(0, 50, 0, 50)
+ReappearButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ReappearButton.Visible = false
 
--- Minimizar funcionalidade
+TabContainer.Name = "TabContainer"
+TabContainer.Parent = MainFrame
+TabContainer.Size = UDim2.new(0, 400, 0, 50)
+TabContainer.Position = UDim2.new(0, 0, 0, 30)
+TabContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+Tab1.Name = "Tab1"
+Tab1.Parent = TabContainer
+Tab1.Text = "Auto Farm Força"
+Tab1.Size = UDim2.new(0, 130, 0, 50)
+Tab1.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+Tab2.Name = "Tab2"
+Tab2.Parent = TabContainer
+Tab2.Text = "Auto Farm Velocidade"
+Tab2.Size = UDim2.new(0, 130, 0, 50)
+Tab2.Position = UDim2.new(0.33, 0, 0, 0)
+Tab2.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+Tab3.Name = "Tab3"
+Tab3.Parent = TabContainer
+Tab3.Text = "PvP"
+Tab3.Size = UDim2.new(0, 130, 0, 50)
+Tab3.Position = UDim2.new(0.66, 0, 0, 0)
+Tab3.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+ContentFrame.Name = "ContentFrame"
+ContentFrame.Parent = MainFrame
+ContentFrame.Size = UDim2.new(1, 0, 0.7, 0)
+ContentFrame.Position = UDim2.new(0, 0, 0.25, 0)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+AutoFarmForceButton.Name = "AutoFarmForceButton"
+AutoFarmForceButton.Parent = ContentFrame
+AutoFarmForceButton.Text = "Ativar Auto Farm Força"
+AutoFarmForceButton.Size = UDim2.new(0, 200, 0, 50)
+AutoFarmForceButton.Position = UDim2.new(0.5, -100, 0.1, 0)
+AutoFarmForceButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+
+AutoFarmSpeedButton.Name = "AutoFarmSpeedButton"
+AutoFarmSpeedButton.Parent = ContentFrame
+AutoFarmSpeedButton.Text = "Ativar Auto Farm Velocidade"
+AutoFarmSpeedButton.Size = UDim2.new(0, 200, 0, 50)
+AutoFarmSpeedButton.Position = UDim2.new(0.5, -100, 0.4, 0)
+AutoFarmSpeedButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+
+PvPButton.Name = "PvPButton"
+PvPButton.Parent = ContentFrame
+PvPButton.Text = "Ativar PvP"
+PvPButton.Size = UDim2.new(0, 200, 0, 50)
+PvPButton.Position = UDim2.new(0.5, -100, 0.7, 0)
+PvPButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+
+-- Funções de Minimizar e Reexibir
 MinimizeButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
-    ReexibirButton.Visible = true
+    ReappearButton.Visible = true
 end)
 
--- Reexibir funcionalidade
-ReexibirButton.MouseButton1Click:Connect(function()
+ReappearButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = true
-    ReexibirButton.Visible = false
+    ReappearButton.Visible = false
 end)
 
--- Tornar o botão de reexibir arrastável
-ReexibirButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        Dragging = true
-        DragStart = input.Position
-        StartPosition = ReexibirButton.Position
+-- Auto Farm Força
+AutoFarmForceButton.MouseButton1Click:Connect(function()
+    autoFarmForceActive = not autoFarmForceActive
+    if autoFarmForceActive then
+        AutoFarmForceButton.Text = "Desativar Auto Farm Força"
+        while autoFarmForceActive do
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
+        end
+    else
+        AutoFarmForceButton.Text = "Ativar Auto Farm Força"
     end
 end)
 
-ReexibirButton.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        DragInput = input
+-- Auto Farm Velocidade
+AutoFarmSpeedButton.MouseButton1Click:Connect(function()
+    autoFarmSpeedActive = not autoFarmSpeedActive
+    if autoFarmSpeedActive then
+        AutoFarmSpeedButton.Text = "Desativar Auto Farm Velocidade"
+        local treadmill = workspace:FindFirstChild("Treadmill") -- Nome da esteira
+        if treadmill then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = treadmill.CFrame
+            wait(0.5)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
+        end
+    else
+        AutoFarmSpeedButton.Text = "Ativar Auto Farm Velocidade"
+        game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
     end
 end)
 
-ReexibirButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        Dragging = false
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == DragInput and Dragging then
-        local Delta = input.Position - DragStart
-        ReexibirButton.Position = UDim2.new(
-            StartPosition.X.Scale,
-            StartPosition.X.Offset + Delta.X,
-            StartPosition.Y.Scale,
-            StartPosition.Y.Offset + Delta.Y
-        )
-    end
-end)
-AutoSpeedButton.MouseButton1Click:Connect(function()
-    autoSpeedEnabled = not autoSpeedEnabled
-    AutoSpeedButton.Text = autoSpeedEnabled and "Auto Farm: Velocidade (ON)" or "Auto Farm: Velocidade (OFF)"
-    if autoSpeedEnabled then
-        spawn(function()
-            while autoSpeedEnabled do
-                wait(0.1)
-                pcall(function()
-                    local player = game.Players.LocalPlayer
-                    local char = player.Character
-                    if char then
-                        local treadmill = workspace:FindFirstChild("Treadmill") or workspace:FindFirstChild("Esteira")
-                        if treadmill then
-                            char.Humanoid:MoveTo(treadmill.Position)
-                        end
+-- PvP
+PvPButton.MouseButton1Click:Connect(function()
+    autoPvPActive = not autoPvPActive
+    if autoPvPActive then
+        PvPButton.Text = "Desativar PvP"
+        while autoPvPActive do
+            wait(0.1)
+            local nearestPlayer = nil
+            local shortestDistance = 30 -- Distância máxima
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < shortestDistance then
+                        nearestPlayer = player
+                        shortestDistance = distance
                     end
-                end)
+                end
             end
-        end)
-    end
-end)
-AutoStrengthButton.MouseButton1Click:Connect(function()
-    autoStrengthEnabled = not autoStrengthEnabled
-    AutoStrengthButton.Text = autoStrengthEnabled and "Auto Farm: Força (ON)" or "Auto Farm: Força (OFF)"
-    if autoStrengthEnabled then
-        spawn(function()
-            while autoStrengthEnabled do
+            if nearestPlayer then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = nearestPlayer.Character.HumanoidRootPart.CFrame
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
                 wait(0.1)
-                pcall(function()
-                    local player = game.Players.LocalPlayer
-                    local char = player.Character
-                    if char then
-                        local tool = char:FindFirstChildOfClass("Tool")
-                        if tool then
-                            tool:Activate() -- Auto Click
-                        end
-                    end
-                end)
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
             end
-        end)
-    end
-end)
-PVPButton.MouseButton1Click:Connect(function()
-    pvpEnabled = not pvpEnabled
-    PVPButton.Text = pvpEnabled and "PVP (ON)" or "PVP (OFF)"
-    if pvpEnabled then
-        spawn(function()
-            while pvpEnabled do
-                wait(0.1)
-                pcall(function()
-                    local player = game.Players.LocalPlayer
-                    local char = player.Character
-                    if char then
-                        local enemy = nil
-                        local closestDistance = 30 -- Limite de 30 metros
-                        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
-                            if otherPlayer ~= player then
-                                local otherChar = otherPlayer.Character
-                                if otherChar and otherChar:FindFirstChild("HumanoidRootPart") then
-                                    local distance = (char.HumanoidRootPart.Position - otherChar.HumanoidRootPart.Position).Magnitude
-                                    if distance < closestDistance then
-                                        closestDistance = distance
-                                        enemy = otherChar
-                                    end
-                                end
-                            end
-                        end
-                        if enemy then
-                            char.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2) -- Teleportar perto
-                            spawn(function()
-                                while pvpEnabled and enemy and enemy:FindFirstChild("Humanoid") do
-                                    wait(0.05)
-                                    local tool = char:FindFirstChildOfClass("Tool")
-                                    if tool then
-                                        tool:Activate() -- Auto Click para atacar
-                                    end
-                                end
-                            end)
-                        end
-                    end
-                end)
-            end
-        end)
+        end
+    else
+        PvPButton.Text = "Ativar PvP"
     end
 end)
