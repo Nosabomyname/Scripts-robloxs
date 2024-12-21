@@ -1,4 +1,4 @@
--- Criar a interface
+-- Interface Gráfica
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local MinimizeButton = Instance.new("TextButton")
@@ -17,7 +17,11 @@ local autoFarmForceActive = false
 local autoFarmSpeedActive = false
 local autoPvPActive = false
 
--- Configuração da interface
+local isDragging = false
+local dragStart = Vector2.new()
+local startPos = Vector2.new()
+
+-- Configuração da Interface
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ResetOnSpawn = false
 
@@ -25,11 +29,32 @@ MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.Size = UDim2.new(0, 400, 0, 300)
--- CORRIGINDO A CENTRALIZAÇÃO DA JANELA
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)  -- Centraliza a janela na tela
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
--- Botão para minimizar
+-- Função para permitir mover a janela
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+MainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = false
+    end
+end)
+
+-- Minimize Button
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = MainFrame
 MinimizeButton.Text = "-"
@@ -37,15 +62,16 @@ MinimizeButton.Size = UDim2.new(0, 50, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -60, 0, 10)
 MinimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 
--- Botão para reexibir
+-- Reappear Button
 ReappearButton.Name = "ReappearButton"
 ReappearButton.Parent = ScreenGui
 ReappearButton.Text = "Delta"
 ReappearButton.Size = UDim2.new(0, 50, 0, 50)
 ReappearButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ReappearButton.Visible = false -- Inicialmente invisível
+ReappearButton.Visible = false
+ReappearButton.Position = UDim2.new(0.5, -25, 0.5, -100)
 
--- Container das abas
+-- Tab Container
 TabContainer.Name = "TabContainer"
 TabContainer.Parent = MainFrame
 TabContainer.Size = UDim2.new(0, 400, 0, 50)
@@ -72,6 +98,7 @@ Tab3.Size = UDim2.new(0, 130, 0, 50)
 Tab3.Position = UDim2.new(0.66, 0, 0, 0)
 Tab3.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 
+-- Content Frame
 ContentFrame.Name = "ContentFrame"
 ContentFrame.Parent = MainFrame
 ContentFrame.Size = UDim2.new(1, 0, 0.7, 0)
@@ -99,30 +126,6 @@ PvPButton.Size = UDim2.new(0, 200, 0, 50)
 PvPButton.Position = UDim2.new(0.5, -100, 0.7, 0)
 PvPButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 
--- Funções para mover a janela
-local dragging = false
-local dragInput, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-MainFrame.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-MainFrame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
 -- Funções de Minimizar e Reexibir
 MinimizeButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
@@ -134,12 +137,11 @@ ReappearButton.MouseButton1Click:Connect(function()
     ReappearButton.Visible = false
 end)
 
--- Funções de Auto Farm Força
+-- Auto Farm Força
 AutoFarmForceButton.MouseButton1Click:Connect(function()
     autoFarmForceActive = not autoFarmForceActive
     if autoFarmForceActive then
         AutoFarmForceButton.Text = "Desativar Auto Farm Força"
-        AutoFarmForceButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Verde (ativado)
         while autoFarmForceActive do
             wait(0.1)
             game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
@@ -148,35 +150,30 @@ AutoFarmForceButton.MouseButton1Click:Connect(function()
         end
     else
         AutoFarmForceButton.Text = "Ativar Auto Farm Força"
-        AutoFarmForceButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Vermelho (desativado)
     end
 end)
 
--- Funções de Auto Farm Velocidade
+-- Auto Farm Velocidade
 AutoFarmSpeedButton.MouseButton1Click:Connect(function()
     autoFarmSpeedActive = not autoFarmSpeedActive
     if autoFarmSpeedActive then
         AutoFarmSpeedButton.Text = "Desativar Auto Farm Velocidade"
-        AutoFarmSpeedButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Verde (ativado)
         local treadmill = workspace:FindFirstChild("Treadmill") -- Nome da esteira
         if treadmill then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = treadmill.CFrame
-            wait(0.5)
-            game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
+            -- Arrastando o personagem para frente
+            local humanoidRootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(0, 0, 10) -- Simula o movimento para frente
         end
     else
         AutoFarmSpeedButton.Text = "Ativar Auto Farm Velocidade"
-        AutoFarmSpeedButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Vermelho (desativado)
-        game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
     end
 end)
 
--- Funções de PvP
+-- PvP
 PvPButton.MouseButton1Click:Connect(function()
     autoPvPActive = not autoPvPActive
     if autoPvPActive then
         PvPButton.Text = "Desativar PvP"
-        PvPButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Verde (ativado)
         while autoPvPActive do
             wait(0.1)
             local nearestPlayer = nil
@@ -199,6 +196,5 @@ PvPButton.MouseButton1Click:Connect(function()
         end
     else
         PvPButton.Text = "Ativar PvP"
-        PvPButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Vermelho (desativado)
     end
 end)
