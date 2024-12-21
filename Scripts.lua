@@ -31,7 +31,7 @@ MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)  -- Centralizado
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
 MinimizeButton.Name = "MinimizeButton"
@@ -45,7 +45,9 @@ ReappearButton.Name = "ReappearButton"
 ReappearButton.Parent = ScreenGui
 ReappearButton.Text = "Delta"
 ReappearButton.Size = UDim2.new(0, 50, 0, 50)
+ReappearButton.Position = UDim2.new(0.5, -25, 0.5, -200)  -- Acima da janela principal
 ReappearButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ReappearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ReappearButton.Visible = false
 
 TabContainer.Name = "TabContainer"
@@ -180,25 +182,4 @@ PvPButton.MouseButton1Click:Connect(function()
         PvPButton.Text = "Desativar PvP"
         while autoPvPActive do
             wait(0.1)
-            local nearestPlayer = nil
-            local shortestDistance = 30 -- Distância máxima
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= game.Players.LocalPlayer then
-                    local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-                    if distance < shortestDistance then
-                        nearestPlayer = player
-                        shortestDistance = distance
-                    end
-                end
-            end
-            if nearestPlayer then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = nearestPlayer.Character.HumanoidRootPart.CFrame
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                wait(0.1)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-            end
-        end
-    else
-        PvPButton.Text = "Ativar PvP"
-    end
-end)
+            local nearest
