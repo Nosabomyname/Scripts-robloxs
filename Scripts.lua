@@ -188,13 +188,7 @@ PvPButton.MouseButton1Click:Connect(function()
                 end
             end
             if nearestPlayer then
+                -- Teleportando para o jogador mais próximo
                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = nearestPlayer.Character.HumanoidRootPart.CFrame
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                wait(0.1)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-            end
-        end
-    else
-        PvPButton.Text = "Ativar PvP"
-    end
-end)
+                -- Clicando no jogador mais próximo
+                game
