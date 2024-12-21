@@ -17,6 +17,12 @@ local autoFarmForceActive = false
 local autoFarmSpeedActive = false
 local autoPvPActive = false
 
+-- Variáveis para arrastar
+local draggingMainFrame = false
+local draggingReappearButton = false
+local dragStart = nil
+local startPos = nil
+
 -- Configuração da Interface
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ResetOnSpawn = false
@@ -105,6 +111,34 @@ ReappearButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = true
     ReappearButton.Visible = false
 end)
+
+-- Função para tornar a janela arrastável
+local function makeDraggable(frame)
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            draggingMainFrame = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if draggingMainFrame and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            draggingMainFrame = false
+        end
+    end)
+end
+
+-- Tornar a janela principal e a de reexibição arrastáveis
+makeDraggable(MainFrame)
+makeDraggable(ReappearButton)
 
 -- Auto Farm Força
 AutoFarmForceButton.MouseButton1Click:Connect(function()
