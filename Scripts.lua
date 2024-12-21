@@ -17,12 +17,6 @@ local autoFarmForceActive = false
 local autoFarmSpeedActive = false
 local autoPvPActive = false
 
--- Variáveis para arrastar
-local draggingMainFrame = false
-local draggingReappearButton = false
-local dragStart = nil
-local startPos = nil
-
 -- Configuração da Interface
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ResetOnSpawn = false
@@ -31,7 +25,7 @@ MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)  -- Centralizado
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 
 MinimizeButton.Name = "MinimizeButton"
@@ -45,9 +39,8 @@ ReappearButton.Name = "ReappearButton"
 ReappearButton.Parent = ScreenGui
 ReappearButton.Text = "Delta"
 ReappearButton.Size = UDim2.new(0, 50, 0, 50)
-ReappearButton.Position = UDim2.new(0.5, -25, 0.5, -200)  -- Acima da janela principal
+ReappearButton.Position = UDim2.new(0.5, -25, 0.5, -75)
 ReappearButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ReappearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ReappearButton.Visible = false
 
 TabContainer.Name = "TabContainer"
@@ -114,34 +107,6 @@ ReappearButton.MouseButton1Click:Connect(function()
     ReappearButton.Visible = false
 end)
 
--- Função para tornar a janela arrastável
-local function makeDraggable(frame)
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            draggingMainFrame = true
-            dragStart = input.Position
-            startPos = frame.Position
-        end
-    end)
-
-    frame.InputChanged:Connect(function(input)
-        if draggingMainFrame and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    frame.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            draggingMainFrame = false
-        end
-    end)
-end
-
--- Tornar a janela principal e a de reexibição arrastáveis
-makeDraggable(MainFrame)
-makeDraggable(ReappearButton)
-
 -- Auto Farm Força
 AutoFarmForceButton.MouseButton1Click:Connect(function()
     autoFarmForceActive = not autoFarmForceActive
@@ -149,6 +114,7 @@ AutoFarmForceButton.MouseButton1Click:Connect(function()
         AutoFarmForceButton.Text = "Desativar Auto Farm Força"
         while autoFarmForceActive do
             wait(0.1)
+            -- Exemplo de clique automático:
             game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
             wait(0.1)
             game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
@@ -182,4 +148,25 @@ PvPButton.MouseButton1Click:Connect(function()
         PvPButton.Text = "Desativar PvP"
         while autoPvPActive do
             wait(0.1)
-            local nearest
+            local nearestPlayer = nil
+            local shortestDistance = 30 -- Distância máxima
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < shortestDistance then
+                        nearestPlayer = player
+                        shortestDistance = distance
+                    end
+                end
+            end
+            if nearestPlayer then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = nearestPlayer.Character.HumanoidRootPart.CFrame
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                wait(0.1)
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
+            end
+        end
+    else
+        PvPButton.Text = "Ativar PvP"
+    end
+end)
