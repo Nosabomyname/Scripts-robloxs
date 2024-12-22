@@ -82,3 +82,85 @@ local function toggleAutoFarm()
     end
 end
 
+-- Obter o jogador local
+local localPlayer = game.Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Variáveis de controle
+local isPVPActive = true -- Ativar/Desativar o PVP automático
+
+-- Função para detectar jogadores vivos
+local function getAlivePlayers()
+    local players = game.Players:GetPlayers()
+    local alivePlayers = {}
+
+    for _, player in ipairs(players) do
+        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("Humanoid") then
+            local targetHumanoid = player.Character:FindFirstChild("Humanoid")
+            if targetHumanoid and targetHumanoid.Health > 0 then
+                table.insert(alivePlayers, player)
+            end
+        end
+    end
+    return alivePlayers
+end
+
+-- Função para atacar jogadores
+local function attackPlayer(targetPlayer)
+    local targetCharacter = targetPlayer.Character
+    if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+        local targetRootPart = targetCharacter:FindFirstChild("HumanoidRootPart")
+
+        -- Teleportar o jogador local para o alvo e atacar
+        rootPart.CFrame = targetRootPart.CFrame
+        wait(0.1) -- Simula um pequeno intervalo entre ataques
+
+        -- Simula ataques contínuos
+        for i = 1, 10 do -- Número de ataques consecutivos
+            if targetCharacter:FindFirstChild("Humanoid") and targetCharacter.Humanoid.Health > 0 then
+                targetCharacter.Humanoid:TakeDamage(50) -- Ajuste o valor do dano
+                print("Atacando: " .. targetPlayer.Name)
+            else
+                print("O alvo " .. targetPlayer.Name .. " já foi derrotado!")
+                break
+            end
+        end
+    end
+end
+
+-- Loop principal para o PVP automático
+spawn(function()
+    while isPVPActive do
+        local alivePlayers = getAlivePlayers()
+
+        if #alivePlayers > 0 then
+            for _, targetPlayer in ipairs(alivePlayers) do
+                if isPVPActive then
+                    attackPlayer(targetPlayer)
+                end
+            end
+        else
+            print("Nenhum jogador vivo encontrado.")
+        end
+        wait(1) -- Intervalo antes de verificar novamente
+    end
+end)
+
+-- Botão para ativar/desativar PVP
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Parent = screenGui
+toggleButton.Size = UDim2.new(0, 200, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -100, 0, -200)
+toggleButton.Text = "Desativar PVP"
+toggleButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+
+toggleButton.MouseButton1Click:Connect(function()
+    isPVPActive = not isPVPActive
+    toggleButton.Text = isPVPActive and "Desativar PVP" or "Ativar PVP"
+    print("PVP Automático " .. (isPVPActive and "Ativado" or "Desativado"))
+end)
