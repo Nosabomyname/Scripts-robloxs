@@ -5,8 +5,8 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 -- Janela principal (quadrada e centralizada)
 local mainFrame = Instance.new("Frame")
 mainFrame.Parent = screenGui
-mainFrame.Size = UDim2.new(0, 200, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+mainFrame.Size = UDim2.new(0, 200, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -150)
 mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderSizePixel = 2
 mainFrame.Visible = true
@@ -14,20 +14,41 @@ mainFrame.Visible = true
 -- Variável para controlar a visibilidade da janela
 local isWindowVisible = true
 
--- Botão de reexibir janela (minimizar/maximizar), posicionado acima da janela principal
+-- Botão de reexibir janela (minimizar/maximizar), aparece quando a janela está minimizada
 local toggleButton = Instance.new("TextButton")
 toggleButton.Parent = screenGui
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
-toggleButton.Position = UDim2.new(0.5, -25, 0, -150)  -- Posicionado acima da janela principal
+toggleButton.Position = UDim2.new(0.5, -25, 0, -150)  -- Posição inicial
 toggleButton.Text = "+"
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+toggleButton.Visible = false -- Inicialmente invisível
 
-toggleButton.MouseButton1Click:Connect(function()
-    -- Alterna a visibilidade da janela principal
+-- Função para alternar a visibilidade da janela principal
+local function toggleWindow()
     isWindowVisible = not isWindowVisible
     mainFrame.Visible = isWindowVisible
-    toggleButton.Text = isWindowVisible and "-" or "+"
+    toggleButton.Visible = not isWindowVisible -- Mostra o botão se a janela estiver minimizada
+end
+
+-- Botão para minimizar/reexibir a janela principal
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Parent = mainFrame
+minimizeButton.Size = UDim2.new(0, 50, 0, 30)
+minimizeButton.Position = UDim2.new(1, -60, 0, 10) -- Posicionado no canto superior direito da janela
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+
+minimizeButton.MouseButton1Click:Connect(toggleWindow)
+
+toggleButton.MouseButton1Click:Connect(function()
+    isWindowVisible = true
+    mainFrame.Visible = true
+    toggleButton.Visible = false
 end)
+
+-- Variáveis de controle para os botões
+local autoFarmActive = false
+local pvpActive = false
 
 -- Função para criar botões
 local function createButton(name, position, callback)
@@ -38,27 +59,26 @@ local function createButton(name, position, callback)
     button.Text = name
     button.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
     button.MouseButton1Click:Connect(callback)
+    return button
 end
 
--- Função para iniciar o Auto Farm simulando cliques contínuos
-local function startAutoFarm()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:WaitForChild("Humanoid")
+-- Função para iniciar/parar o Auto Farm
+local function toggleAutoFarm()
+    autoFarmActive = not autoFarmActive
+    if autoFarmActive then
+        print("Auto Farm ativado")
+        while autoFarmActive do
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            local farmPosition = Vector3.new(0, 0, 0) -- Ajustar para a posição de treino
 
-    -- Posição de treino ou ferramenta
-    local farmPosition = Vector3.new(0, 0, 0) -- Ajustar para a posição desejada
-
-    while true do
-        if not isWindowVisible then break end -- Para se a janela for minimizada
-        humanoid:MoveTo(farmPosition)  -- Move o personagem para a posição de treino
-        wait(1)  -- Simula o atraso entre os cliques
-        print("Auto Farm em andamento...")
+            humanoid:MoveTo(farmPosition)
+            wait(1)
+            print("Farmando...")
+        end
+    else
+        print("Auto Farm desativado")
     end
 end
 
--- Botão para ativar Auto Farm
-createButton("Ativar Auto Farm", UDim2.new(0, 10, 0, 50), function()
-    print("Auto Farm ativado")
-    startAutoFarm()
-end)
