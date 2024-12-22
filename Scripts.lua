@@ -11,6 +11,23 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderSizePixel = 2
 mainFrame.Visible = true
 
+-- Variável para controle de visibilidade da janela
+local isWindowVisible = true
+
+-- Botão de minimizar
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Parent = mainFrame
+minimizeButton.Size = UDim2.new(0, 50, 0, 30)
+minimizeButton.Position = UDim2.new(1, -60, 0, 10)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+
+-- Função para minimizar
+minimizeButton.MouseButton1Click:Connect(function()
+    isWindowVisible = not isWindowVisible
+    mainFrame.Visible = isWindowVisible
+end)
+
 -- Botão de Auto Farm
 local autoFarmButton = Instance.new("TextButton")
 autoFarmButton.Parent = mainFrame
