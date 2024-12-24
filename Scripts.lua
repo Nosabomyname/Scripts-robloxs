@@ -71,7 +71,6 @@ rewardButton.Text = "Recompensa (30s)"
 rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 rewardButton.Parent = window
 
--- Lógica de recompensa com cooldown de 30 segundos
 local lastRewardTime = tick()
 local rewardCooldown = 30
 
@@ -83,20 +82,20 @@ rewardButton.InputBegan:Connect(function(input)
             -- Lógica para dar a recompensa
             print("Recompensa recebida!")
 
-            -- Exemplo de aumentar os valores (modifique conforme necessário)
+            -- Exemplo de aumentar os valores (modificado conforme solicitado)
             local playerStats = player:FindFirstChild("leaderstats")
             if playerStats then
                 local strength = playerStats:FindFirstChild("Strength")
                 local gems = playerStats:FindFirstChild("Gems")
                 local rebirths = playerStats:FindFirstChild("Rebirths")
                 if strength then
-                    strength.Value = strength.Value + 100
+                    strength.Value = strength.Value + 1000000  -- Aumentar 1 milhão de Strength
                 end
                 if gems then
-                    gems.Value = gems.Value + 100
+                    gems.Value = gems.Value + 10000  -- Aumentar 10 mil Gems
                 end
                 if rebirths then
-                    rebirths.Value = rebirths.Value + 1
+                    rebirths.Value = 100  -- Definir Rebirths para 100
                 end
             end
 
@@ -116,28 +115,8 @@ rewardButton.InputBegan:Connect(function(input)
         end
     end
 end)
-
--- Funções para os outros botões (colocar lógicas reais dos scripts)
-autoFarmButton.MouseButton1Click:Connect(function()
-    -- Ativar o Auto Farm
-    print("Auto Farm Ativado!")
-end)
-
-pvpNormalButton.MouseButton1Click:Connect(function()
-    -- Ativar PvP Normal
-    print("PvP Normal Ativado!")
-end)
-
-autoMortalKillButton.MouseButton1Click:Connect(function()
-    -- Ativar Auto Mortal Kill
-    print("Auto Mortal Kill Ativado!")
-end)local UserInputService = game:GetService("UserInputService")
-
--- Variáveis de controle
 local isAutoFarmActive = false
-local autoFarmButton = script.Parent -- Supondo que o botão esteja em 'script.Parent'
 
--- Função para ativar e desativar o Auto Farm
 autoFarmButton.MouseButton1Click:Connect(function()
     isAutoFarmActive = not isAutoFarmActive
     if isAutoFarmActive then
@@ -147,7 +126,6 @@ autoFarmButton.MouseButton1Click:Connect(function()
         
         -- Iniciar a simulação de múltiplos toques rápidos
         while isAutoFarmActive do
-            -- Simula um toque na tela em uma posição aleatória (ajuste conforme necessário)
             local screenSize = workspace.CurrentCamera.ViewportSize
             local randomPos = Vector2.new(math.random(0, screenSize.X), math.random(0, screenSize.Y))
             
@@ -157,109 +135,21 @@ autoFarmButton.MouseButton1Click:Connect(function()
             touchInput.Position = randomPos
             UserInputService.InputBegan:Fire(touchInput)
 
-            -- Ajuste a frequência de cliques
-            wait(0.05) -- Ajuste a frequência de cliques conforme necessário
+            wait(0.05)
         end
     else
         autoFarmButton.Text = "Auto Farm: Desligado"
         autoFarmButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
         print("Auto Farm Desativado")
     end
-end)-- Botão de Recompensa ajustado
-local rewardButton = Instance.new("TextButton")
-rewardButton.Parent = mainFrame
-rewardButton.Size = UDim2.new(0, 250, 0, 50)
-rewardButton.Position = UDim2.new(0, 25, 0, 50)
-rewardButton.Text = "Receber Recompensa"
-rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+end)
+local isMortalAutoKillActive = false
 
--- Função de Recompensa (força, gemas, XP dos pets e rebirths)
-local lastRewardTime = 0
-local rewardCooldown = 30 -- Tempo reduzido para 30 segundos
-
--- Função que aumenta as habilidades (XP) dos pets e salva as habilidades
-local function increasePetsXP()
-    local player = game.Players.LocalPlayer
-    local playerPets = player:FindFirstChild("Pets") -- Aqui assume-se que o jogador tem um objeto Pets
-
-    if playerPets then
-        for _, pet in pairs(playerPets:GetChildren()) do
-            local petXP = pet:FindFirstChild("XP")
-            if petXP then
-                -- Aumenta o XP do pet para o valor máximo possível (exemplo: 1000)
-                petXP.Value = petXP.Value + 1000
-                -- Salvar o XP para que ele não diminua ao reiniciar
-                petXP.Changed:Connect(function()
-                    petXP.Value = petXP.Value -- Garante que o XP não diminua
-                end)
-            end
-        end
-    end
-end
-
--- Usar o evento InputBegan para garantir que funcione em Android (touch) e PC (mouse)
-rewardButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        local currentTime = tick()
-
-        -- Verifica se já se passaram 30 segundos
-        if currentTime - lastRewardTime >= rewardCooldown then
-            lastRewardTime = currentTime
-
-            -- Dando recompensas
-            local player = game.Players.LocalPlayer
-            local playerStats = player:FindFirstChild("leaderstats")
-
-            if playerStats then
-                local strength = playerStats:FindFirstChild("Strength")
-                local gems = playerStats:FindFirstChild("Gems")
-                local rebirths = playerStats:FindFirstChild("Rebirths")
-
-                -- 1. Aumenta o máximo de força possível (1 milhão)
-                if strength then
-                    strength.Value = 1000000 -- Aumenta para 1 milhão de força
-                end
-
-                -- 2. Aumenta 10.000 gemas
-                if gems then
-                    gems.Value = gems.Value + 10000 -- Aumenta 10.000 gemas
-                end
-
-                -- 3. Aumenta XP dos pets (habilidades)
-                increasePetsXP()
-
-                -- 4. Aumenta 20x rebirths ou mais
-                if rebirths then
-                    rebirths.Value = rebirths.Value + 20 -- Aumenta 20x rebirths
-                end
-            end
-
-            -- Feedback visual de recompensa recebida
-            rewardButton.Text = "Recompensa Recebida!"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-
-            wait(1)
-
-            -- Resetando o botão após a recompensa
-            rewardButton.Text = "Receber Recompensa"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-        else
-            -- Se o cooldown não tiver acabado
-            local remainingTime = math.ceil(rewardCooldown - (currentTime - lastRewardTime))
-            rewardButton.Text = "Aguarde: " .. remainingTime .. "s"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-
-            wait(1)
-
-            rewardButton.Text = "Receber Recompensa"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-        end
-    end
-end)mortalAutoKillButton.MouseButton1Click:Connect(function()
+autoMortalKillButton.MouseButton1Click:Connect(function()
     isMortalAutoKillActive = not isMortalAutoKillActive
     if isMortalAutoKillActive then
-        mortalAutoKillButton.Text = "Mortal Auto Kill: Ligado"
-        mortalAutoKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        autoMortalKillButton.Text = "Mortal Auto Kill: Ligado"
+        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         
         for _, player in ipairs(game.Players:GetPlayers()) do
             if player ~= game.Players.LocalPlayer and player.Character then
@@ -270,19 +160,14 @@ end)mortalAutoKillButton.MouseButton1Click:Connect(function()
             end
         end
     else
-        mortalAutoKillButton.Text = "Mortal Auto Kill: Desligado"
-        mortalAutoKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        autoMortalKillButton.Text = "Mortal Auto Kill: Desligado"
+        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     end
-end)local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local mouse = player:GetMouse()
-
+end)
 local teleportDistance = 10 -- Distância para detectar o jogador mais próximo
 local attackCooldown = 0.5 -- Tempo entre os "cliques" automáticos
 local attacking = false
 
--- Função para verificar se um jogador está dentro do raio
 local function getClosestPlayer()
     local closestPlayer = nil
     local shortestDistance = teleportDistance
@@ -303,7 +188,6 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- Função para iniciar o PvP
 local function startPvP(targetPlayer)
     local targetCharacter = targetPlayer.Character
     if not targetCharacter then return end
@@ -314,29 +198,13 @@ local function startPvP(targetPlayer)
     -- Começa a atacar rapidamente
     attacking = true
     while attacking do
-        -- Aqui vamos simular o ataque
-        -- Simula um dano no outro jogador (exemplo simples de ataque)
         local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
         if targetHumanoid then
             targetHumanoid:TakeDamage(10) -- Causa 10 de dano no outro jogador
         end
-        
-        -- Aguarda um tempo entre os ataques
         wait(attackCooldown)
     end
 end
 
--- Função para parar o PvP
 local function stopPvP()
     attacking = false
-end
-
--- Verificar constantemente o jogador mais próximo
-game:GetService("RunService").Heartbeat:Connect(function()
-    local closestPlayer = getClosestPlayer()
-    if closestPlayer then
-        startPvP(closestPlayer)
-    else
-        stopPvP() -- Caso não haja jogadores próximos, para o PvP
-    end
-end)
