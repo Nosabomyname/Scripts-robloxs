@@ -142,9 +142,29 @@ end
 createButton(mainFrame, "Auto Farm: Desligado", UDim2.new(0, 25, 0, 50), toggleAutoFarm)
 createButton(mainFrame, "PvP: Desligado", UDim2.new(0, 25, 0, 120), togglePvP)
 createButton(mainFrame, "Mortal Auto Kill: Desligado", UDim2.new(0, 25, 0, 190), toggleMortalAutoKill)
-createButton(mainFrame, "Receber Recompensa", UDim2.new(0, 25, 0, 260), claimReward)
-
-local player = game.Players.LocalPlayer
+createButton(mainFrame, "Receber Recompensa", UDim2.new(0, 25, 0, 260), claimReward)autoFarmButton.MouseButton1Click:Connect(function()
+    isAutoFarmActive = not isAutoFarmActive
+    if isAutoFarmActive then
+        autoFarmButton.Text = "Auto Farm: Ligado"
+        autoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        print("Auto Farm Ativado")
+        
+        -- Exemplo de lógica de Auto Farm
+        while isAutoFarmActive do
+            local player = game.Players.LocalPlayer
+            local character = player.Character
+            if character then
+                -- Adicione ações específicas do Auto Farm, como usar ferramentas ou coletar itens
+                print("Executando Auto Farm...")
+            end
+            wait(0.05)
+        end
+    else
+        autoFarmButton.Text = "Auto Farm: Desligado"
+        autoFarmButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        print("Auto Farm Desativado")
+    end
+end)local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local mouse = player:GetMouse()
@@ -210,33 +230,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
     else
         stopPvP() -- Caso não haja jogadores próximos, para o PvP
     end
-end)
-
-autoFarmButton.MouseButton1Click:Connect(function()
-    isAutoFarmActive = not isAutoFarmActive
-    if isAutoFarmActive then
-        autoFarmButton.Text = "Auto Farm: Ligado"
-        autoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        print("Auto Farm Ativado")
-        
-        -- Exemplo de lógica de Auto Farm
-        while isAutoFarmActive do
-            local player = game.Players.LocalPlayer
-            local character = player.Character
-            if character then
-                -- Adicione ações específicas do Auto Farm, como usar ferramentas ou coletar itens
-                print("Executando Auto Farm...")
-            end
-            wait(0.05)
-        end
-    else
-        autoFarmButton.Text = "Auto Farm: Desligado"
-        autoFarmButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        print("Auto Farm Desativado")
-    end
-end)
-
-mortalAutoKillButton.MouseButton1Click:Connect(function()
+end)mortalAutoKillButton.MouseButton1Click:Connect(function()
     isMortalAutoKillActive = not isMortalAutoKillActive
     if isMortalAutoKillActive then
         mortalAutoKillButton.Text = "Mortal Auto Kill: Ligado"
@@ -254,9 +248,7 @@ mortalAutoKillButton.MouseButton1Click:Connect(function()
         mortalAutoKillButton.Text = "Mortal Auto Kill: Desligado"
         mortalAutoKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     end
-end)
-
--- Botão de Recompensa ajustado
+end)-- Botão de Recompensa ajustado
 local rewardButton = Instance.new("TextButton")
 rewardButton.Parent = mainFrame
 rewardButton.Size = UDim2.new(0, 250, 0, 50)
