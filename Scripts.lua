@@ -64,59 +64,13 @@ autoMortalKillButton.Text = "Auto Mortal Kill"
 autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 autoMortalKillButton.Parent = window
 
-local rewardButton = Instance.new("TextButton")
-rewardButton.Size = UDim2.new(0, 150, 0, 50)
-rewardButton.Position = UDim2.new(0.5, -75, 0, 230)
-rewardButton.Text = "Recompensa (30s)"
-rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-rewardButton.Parent = window
-
-local lastRewardTime = tick()
-local rewardCooldown = 30
-
-rewardButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        local currentTime = tick()
-        if currentTime - lastRewardTime >= rewardCooldown then
-            lastRewardTime = currentTime
-            -- Lógica para dar a recompensa
-            print("Recompensa recebida!")
-
-            -- Exemplo de aumentar os valores (modificado conforme solicitado)
-            local playerStats = player:FindFirstChild("leaderstats")
-            if playerStats then
-                local strength = playerStats:FindFirstChild("Strength")
-                local gems = playerStats:FindFirstChild("Gems")
-                local rebirths = playerStats:FindFirstChild("Rebirths")
-                if strength then
-                    strength.Value = strength.Value + 1000000  -- Aumentar 1 milhão de Strength
-                end
-                if gems then
-                    gems.Value = gems.Value + 10000  -- Aumentar 10 mil Gems
-                end
-                if rebirths then
-                    rebirths.Value = 100  -- Definir Rebirths para 100
-                end
-            end
-
-            -- Feedback visual de recompensa recebida
-            rewardButton.Text = "Recompensa Recebida!"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-
-            wait(1)
-
-            -- Resetando o botão após a recompensa
-            rewardButton.Text = "Recompensa (30s)"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-        else
-            local remainingTime = math.ceil(rewardCooldown - (currentTime - lastRewardTime))
-            rewardButton.Text = "Aguarde: " .. remainingTime .. "s"
-            rewardButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        end
-    end
-end)
+-- Variáveis para o Auto Farm e Anti AFK
 local isAutoFarmActive = false
+local isAntiAFKActive = false
+local UserInputService = game:GetService("UserInputService")
+local lastClickTime = tick()
 
+-- Função Auto Farm (Simula o clique)
 autoFarmButton.MouseButton1Click:Connect(function()
     isAutoFarmActive = not isAutoFarmActive
     if isAutoFarmActive then
@@ -124,7 +78,7 @@ autoFarmButton.MouseButton1Click:Connect(function()
         autoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         print("Auto Farm Ativado")
         
-        -- Iniciar a simulação de múltiplos toques rápidos
+        -- Inicia a simulação de múltiplos toques rápidos
         while isAutoFarmActive do
             local screenSize = workspace.CurrentCamera.ViewportSize
             local randomPos = Vector2.new(math.random(0, screenSize.X), math.random(0, screenSize.Y))
@@ -143,33 +97,34 @@ autoFarmButton.MouseButton1Click:Connect(function()
         print("Auto Farm Desativado")
     end
 end)
-local isMortalAutoKillActive = false
 
-autoMortalKillButton.MouseButton1Click:Connect(function()
-    isMortalAutoKillActive = not isMortalAutoKillActive
-    if isMortalAutoKillActive then
-        autoMortalKillButton.Text = "Mortal Auto Kill: Ligado"
-        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player ~= game.Players.LocalPlayer and player.Character then
-                local humanoid = player.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.Health = 0
-                end
-            end
+-- Função Anti AFK (Simula movimentos)
+local function antiAFK()
+    isAntiAFKActive = true
+    while isAntiAFKActive do
+        -- Simula um pequeno movimento do mouse a cada 10 segundos
+        if tick() - lastClickTime >= 10 then
+            local mouse = game.Players.LocalPlayer:GetMouse()
+            mouse.Move:Fire(Vector3.new(0, 0, 0))  -- Movimentação do mouse
+            lastClickTime = tick()
         end
-    else
-        autoMortalKillButton.Text = "Mortal Auto Kill: Desligado"
-        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        wait(5)
+    end
+end
+
+-- Inicia o Anti AFK quando o Auto Farm é ativado
+autoFarmButton.MouseButton1Click:Connect(function()
+    if isAutoFarmActive then
+        antiAFK()  -- Inicia o Anti AFK
     end
 end)
-local teleportDistance = 10 -- Distância para detectar o jogador mais próximo
-local attackCooldown = 0.5 -- Tempo entre os "cliques" automáticos
-local attacking = false
 
-local function getClosestPlayer()
+-- Função PvP Normal (Simples)
+pvpNormalButton.MouseButton1Click:Connect(function()
+    -- Função para atacar o jogador mais próximo
     local closestPlayer = nil
+    local teleportDistance = 10 -- Distância para detectar o jogador mais próximo
+    local character = player.Character
     local shortestDistance = teleportDistance
     
     -- Itera sobre todos os jogadores no jogo
@@ -185,26 +140,39 @@ local function getClosestPlayer()
             end
         end
     end
-    return closestPlayer
-end
-
-local function startPvP(targetPlayer)
-    local targetCharacter = targetPlayer.Character
-    if not targetCharacter then return end
     
-    -- Teleporta para o jogador mais próximo
-    character:SetPrimaryPartCFrame(targetCharacter.HumanoidRootPart.CFrame)
-    
-    -- Começa a atacar rapidamente
-    attacking = true
-    while attacking do
-        local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
-        if targetHumanoid then
-            targetHumanoid:TakeDamage(10) -- Causa 10 de dano no outro jogador
+    -- Se o jogador mais próximo for encontrado, teleportar e atacar
+    if closestPlayer then
+        local targetCharacter = closestPlayer.Character
+        if targetCharacter then
+            character:SetPrimaryPartCFrame(targetCharacter.HumanoidRootPart.CFrame)
+            local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+            if targetHumanoid then
+                targetHumanoid.Health = 0  -- Mata o outro jogador independente de sua saúde
+            end
         end
-        wait(attackCooldown)
     end
-end
+end)
 
-local function stopPvP()
-    attacking = false
+-- Função Mortal Auto Kill (Desativa ou Ativa a função)
+autoMortalKillButton.MouseButton1Click:Connect(function()
+    local isMortalAutoKillActive = false
+    isMortalAutoKillActive = not isMortalAutoKillActive
+    if isMortalAutoKillActive then
+        autoMortalKillButton.Text = "Mortal Auto Kill: Ligado"
+        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        
+        -- Mata todos os jogadores no jogo
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                local humanoid = player.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.Health = 0  -- Mata todos os jogadores
+                end
+            end
+        end
+    else
+        autoMortalKillButton.Text = "Mortal Auto Kill: Desligado"
+        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    end
+end)
