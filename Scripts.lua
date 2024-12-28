@@ -1,178 +1,111 @@
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Criar a tela da GUI
 local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player.PlayerGui
+screenGui.Parent = playerGui
 
--- Criando a janela
-local window = Instance.new("Frame")
-window.Size = UDim2.new(0, 300, 0, 300)
-window.Position = UDim2.new(0.5, -150, 0.5, -150)
-window.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-window.BorderSizePixel = 2
-window.Parent = screenGui
+-- Criar o painel da janela
+local frame = Instance.new("Frame")
+frame.Parent = screenGui
+frame.Size = UDim2.new(
+frame.Parent = screenGui
+frame
+0, 300, 0, 200)
+frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BorderSizePixel = 2
 
--- Criando o botão de minimizar
+-- Criar o botão de minimizar
 local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0, 50, 0, 25)
-minimizeButton.Position = UDim2.new(0.9, 0, 0, 0)
-minimizeButton.Text = "-"
-minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-minimizeButton.Parent = window
+minimizeButton.Parent = frame
+minimizeButton.Size = UDim2.new(0, 100, 0, 30)
+minimizeButton.Position = UDim2.new(0, 10, 0, 10)
+minimizeButton.Text = 
+minimize
+"Minimizar"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(
+minim
+100, 100, 100)
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Criando o botão de reexibir
-local reexhibitButton = Instance.new("TextButton")
-reexhibitButton.Size = UDim2.new(0, 50, 0, 25)
-reexhibitButton.Position = UDim2.new(0.5, -25, 0, -30)
-reexhibitButton.Text = "Reexibir"
-reexhibitButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-reexhibitButton.Parent = screenGui
-reexhibitButton.Visible = false
+-- Criar o botão de reexibir
 
--- Função para minimizar a janela
-local function minimizeWindow()
-    window.Visible = false
-    reexhibitButton.Visible = true
-end
+l
+local reDisplayButton = Instance.new("TextButton")
+reDisplayButton.Parent = screenGui
+reDisplayButton.Size = UDim2.new(
+reDisplayButton.Parent = screenGui
+reDi
 
--- Função para reexibir a janela
-local function reexhibitWindow()
-    window.Visible = true
-    reexhibitButton.Visible = false
-end
+reDisplay
+0, 100, 0, 30)
+reDisplayButton.Position = UDim2.new(
+reDisplayButton.Pos
+0.5, -50, 0, 10)
+reDisplayButton.Text = "Reexibir"
+reDisplayButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+reDisplayButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-minimizeButton.MouseButton1Click:Connect(minimizeWindow)
-reexhibitButton.MouseButton1Click:Connect(reexhibitWindow)
+-- Criar o botão de farm
 
--- Criando os botões adicionais na janela
-local autoFarmButton = Instance.new("TextButton")
-autoFarmButton.Size = UDim2.new(0, 150, 0, 50)
-autoFarmButton.Position = UDim2.new(0.5, -75, 0, 50)
-autoFarmButton.Text = "Auto Farm"
-autoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-autoFarmButton.Parent = window
+loc
+local farmButton = Instance.new("TextButton")
+farmButton.Parent = frame
+farmButton.Size = UDim2.new(
+farmButton.Parent
+0, 100, 0, 30)
+farmButton.Position = UDim2.new(0, 10, 0, 50)
+farmButton.Text = 
+far
+"Iniciar Farm"
+farmButton.BackgroundColor3 = Color3.fromRGB(
+farmButton.BackgroundColor3 = Col
+0, 255, 0)
+farmButton.TextColor3 = Color3.fromRGB(
+farmButton.Te
+0, 0, 0)
 
-local pvpNormalButton = Instance.new("TextButton")
-pvpNormalButton.Size = UDim2.new(0, 150, 0, 50)
-pvpNormalButton.Position = UDim2.new(0.5, -75, 0, 110)
-pvpNormalButton.Text = "PvP Normal"
-pvpNormalButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-pvpNormalButton.Parent = window
+-- Variável para controlar o estado do auto click
+local autoClickEnabled = false
+local clickDelay = 0.1 -- Intervalo entre os cliques
 
-local autoMortalKillButton = Instance.new("TextButton")
-autoMortalKillButton.Size = UDim2.new(0, 150, 0, 50)
-autoMortalKillButton.Position = UDim2.new(0.5, -75, 0, 170)
-autoMortalKillButton.Text = "Auto Mortal Kill"
-autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-autoMortalKillButton.Parent = window
-
--- Variáveis para o Auto Farm e Anti AFK
-local isAutoFarmActive = false
-local isAntiAFKActive = false
-local UserInputService = game:GetService("UserInputService")
-local lastClickTime = tick()
-
--- Função Auto Farm (Simula o clique)
-autoFarmButton.MouseButton1Click:Connect(function()
-    isAutoFarmActive = not isAutoFarmActive
-    if isAutoFarmActive then
-        autoFarmButton.Text = "Auto Farm: Ligado"
-        autoFarmButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        print("Auto Farm Ativado")
+-- Função de auto-click para Android
+local function autoClick()
+    while autoClickEnabled do
+        -- Obtém a posição do toque na tela
+        local touch = player:GetMouse().Hit.Position
+        local screenPos = workspace.CurrentCamera:WorldToScreenPoint(touch)
         
-        -- Inicia a simulação de múltiplos toques rápidos
-        while isAutoFarmActive do
-            local screenSize = workspace.CurrentCamera.ViewportSize
-            local randomPos = Vector2.new(math.random(0, screenSize.X), math.random(0, screenSize.Y))
-            
-            -- Criar o toque e simular a entrada
-            local touchInput = Instance.new("InputObject")
-            touchInput.UserInputType = Enum.UserInputType.Touch
-            touchInput.Position = randomPos
-            UserInputService.InputBegan:Fire(touchInput)
-
-            wait(0.05)
-        end
-    else
-        autoFarmButton.Text = "Auto Farm: Desligado"
-        autoFarmButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        print("Auto Farm Desativado")
-    end
-end)
-
--- Função Anti AFK (Simula movimentos)
-local function antiAFK()
-    isAntiAFKActive = true
-    while isAntiAFKActive do
-        -- Simula um pequeno movimento do mouse a cada 10 segundos
-        if tick() - lastClickTime >= 10 then
-            local mouse = game.Players.LocalPlayer:GetMouse()
-            mouse.Move:Fire(Vector3.new(0, 0, 0))  -- Movimentação do mouse
-            lastClickTime = tick()
-        end
-        wait(5)
+        -- Simula um clique na posição da tela (touch)
+        game:GetService("UserInputService"):InputBegin(Enum.UserInputType.Touch, screenPos)
+        wait(clickDelay)
+        game:GetService("UserInputService"):InputEnd(Enum.UserInputType.Touch, screenPos)
     end
 end
 
--- Inicia o Anti AFK quando o Auto Farm é ativado
-autoFarmButton.MouseButton1Click:Connect(function()
-    if isAutoFarmActive then
-        antiAFK()  -- Inicia o Anti AFK
-    end
+-- Funcionalidade do botão de minimizar
+minimizeButton.MouseButton1Click:Connect(function()
+    frame.Visible = false
 end)
 
--- Função PvP Normal (Simples)
-pvpNormalButton.MouseButton1Click:Connect(function()
-    -- Função para atacar o jogador mais próximo
-    local closestPlayer = nil
-    local teleportDistance = 10 -- Distância para detectar o jogador mais próximo
-    local character = player.Character
-    local shortestDistance = teleportDistance
-    
-    -- Itera sobre todos os jogadores no jogo
-    for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
-        if otherPlayer ~= player then
-            local otherCharacter = otherPlayer.Character
-            if otherCharacter and otherCharacter:FindFirstChild("HumanoidRootPart") then
-                local distance = (character.HumanoidRootPart.Position - otherCharacter.HumanoidRootPart.Position).Magnitude
-                if distance < shortestDistance then
-                    closestPlayer = otherPlayer
-                    shortestDistance = distance
-                end
-            end
-        end
-    end
-    
-    -- Se o jogador mais próximo for encontrado, teleportar e atacar
-    if closestPlayer then
-        local targetCharacter = closestPlayer.Character
-        if targetCharacter then
-            character:SetPrimaryPartCFrame(targetCharacter.HumanoidRootPart.CFrame)
-            local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
-            if targetHumanoid then
-                targetHumanoid.Health = 0  -- Mata o outro jogador independente de sua saúde
-            end
-        end
-    end
+-- Funcionalidade do botão de reexibir
+reDisplayButton.MouseButton1Click:Connect(function()
+    frame.Visible = true
+
+en
 end)
 
--- Função Mortal Auto Kill (Desativa ou Ativa a função)
-autoMortalKillButton.MouseButton1Click:Connect(function()
-    local isMortalAutoKillActive = false
-    isMortalAutoKillActive = not isMortalAutoKillActive
-    if isMortalAutoKillActive then
-        autoMortalKillButton.Text = "Mortal Auto Kill: Ligado"
-        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        
-        -- Mata todos os jogadores no jogo
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player ~= game.Players.LocalPlayer and player.Character then
-                local humanoid = player.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.Health = 0  -- Mata todos os jogadores
-                end
-            end
-        end
+-- Funcionalidade do botão de farm
+farmButton.MouseButton1Click:Connect(
+fa
+function()
+    autoClickEnabled = not autoClickEnabled
+    if autoClickEnabled then
+        farmButton.Text = "Parar Farm"
+        autoClick()  -- Inicia o clique automático
     else
-        autoMortalKillButton.Text = "Mortal Auto Kill: Desligado"
-        autoMortalKillButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        farmButton.Text = "Iniciar Farm"
     end
 end)
